@@ -6,14 +6,18 @@
 .text
 
 main:
-    addi s0 zero 6 # a
-    addi s1 zero 12 # b
+    addi s0 zero 5 # a
+    addi s1 zero 3 # b
     addi s2 zero 0 # c Result
     
     # lcm
     add a0 s0 zero
     add a1 s1 zero
     jal ra gdc
+    
+    # Once coming back fom recursion, we have stored in s2 gdc(a,b)
+    mul t0 s0 s1
+    div s2 t0 s2
     
     
     addi a7 zero 10
@@ -36,13 +40,14 @@ gdc:
     add t1 zero a1
     
     # Turn a0 into a1, a = b which means first paremeter = second one
-    add a0 zero t1
     # Get remainter a%b to b
     remu a1 a0 t1
+    add a0 zero t1
+    
+    jal ra gdc
     
     # Once it comes back from recursion
     jal zero end_gdc # Use jal to skip the next line base_case_gdc
-    
     
     base_case_gdc:
         # Add a0 as the result to s2
@@ -50,6 +55,6 @@ gdc:
     
     end_gdc:
         # Stack frame
-        lw a0 -4 sp
+        lw ra 8 sp
         addi sp sp 12 # Get back Stack Frame
         jalr zero ra 0 # Move to ra
