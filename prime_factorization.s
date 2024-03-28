@@ -3,13 +3,15 @@
 # Eduardo 27/03/2024
 
 .data
-
+result:
 
 
 
 .text
 main:
-    addi s0 zero 12 # N Input
+    addi s0 zero 632 # N Input
+    lui s1 %hi(result)
+    addi s1 s1 %lo(result) # Pointer where result will be stored
     
     add a0 zero s0
     jal ra factorization
@@ -22,7 +24,7 @@ main:
 factorization:
     # Stack frame
     addi sp sp -4
-    sw ra 4 sp
+    sw ra 0 sp
     
     # base case a0 == 1
     addi t1 zero 1
@@ -41,6 +43,8 @@ factorization:
     end_loop:
         # Make division which will be an integer
         div a0 a0 t0
+        addi s1 s1 4 # Move a word to store the result
+        sw t0 0(s1)
         
      jal ra factorization
      
@@ -49,56 +53,13 @@ factorization:
     
     base_case:
         # Load the last 1
-        sw a0 0(sp)
+        
+        addi s1 s1 4 # Move a word to store the result
+        sw a0 0(s1)
         
     
     
     end_factorization:
-        lw ra 4 sp
+        lw ra 0 sp
         addi sp sp 4 # Return what was borrowed
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        jalr zero ra 0
