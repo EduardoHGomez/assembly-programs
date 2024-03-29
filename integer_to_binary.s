@@ -8,7 +8,7 @@
 .text
 
 main:
-    addi a0 zero 56 # N Input
+    addi a0 zero 345 # N Input
     addi a1 zero 1 # Multiplier
     addi s1 zero 0 # Result
     
@@ -37,7 +37,7 @@ recursive_call:
     add s1 s1 t0 # Add to result
     
     # Toggle multiplier by 10
-    addi a1 zero 10
+    addi t0 zero 10
     mul a1 a1 t0
     
     # Divide by 2 and store value
@@ -51,4 +51,5 @@ recursive_call:
     # Get back stack frame
     end_recursion:
     lw ra 0 sp
+    addi sp sp 4
     jalr zero ra 0
