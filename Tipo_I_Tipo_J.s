@@ -16,6 +16,23 @@ addi t1 zero salto
 # es decir, que sea relativo
 salto: addi a5 zero 32
 
+# BRINCOS NO CONDICIONALES
+# Tipo I jalr rd rs1 mm
+# y Tipo J
+
+# Tipo I
+jal ra funcion # Aqui definimos funcion que esta hasta arriba
+ori s0 s1 2
+
+# Tipo J
+# rd rs1 imm (offset)
+jalr zero ra 0 # zero = PC + 4 (no va a pasar) y PC = ra + 0
+# En la linea pasada, aseguramos que no se guarde en rd una
+# direccion de retorno, simplemento porque no la necesitamos
+
+
+
+
 
 
 
