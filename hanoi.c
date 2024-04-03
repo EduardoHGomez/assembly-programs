@@ -1,6 +1,8 @@
 #include <stdio.h>
 
 void pm(int start, int end) {
+    // Every pm represents that the top of start moves to three
+
     printf("%d => %d\n", start, end);
     return;
 }
@@ -21,7 +23,7 @@ void hanoi(int n, int start, int end) {
 
 
 int main() {
-    int N = 5;
+    int N = 7;
     hanoi(N, 1, 3);
     return 0;
 }
