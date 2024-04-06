@@ -180,6 +180,72 @@ moveOriM3:
 
 #==========================================
 
+base_case:
+    # Hacer swap
+    jal ra swap
+
+    # Ir a end_hanoi 
+    jal zero end_hanoi_return
+
+
+
+
+swap:
+    # t0 = origen
+    # t1 = destino 
+
+    # if origen == 1 entonces t0 = s1
+    addi t2 zero 1 
+    beq a1 t2 asignar_t0_s1
+
+    # if origen == 2 entonces t0 = s2
+    addi t2 zero 2 
+    beq a1 t2 asignar_t0_s2
+
+    # if origen == 3 entonces t0 = s3
+    addi t2 zero 3 
+    beq a1 t2 asignar_t0_s3
+
+    end_hanoi_destino:
+
+
+        # if destino == 1 entonces t1 = s1
+        addi t2 zero 1 
+        beq a2 t2 asignar_t1_s1
+
+        # if destino == 2 entonces t1 = s2
+        addi t2 zero 2 
+        beq a2 t2 asignar_t1_s2
+        
+        # if destino == 3 entonces t1 = s3
+        addi t2 zero 3 
+        beq a2 t2 asignar_t1_s3
+
+    # SIGUIENTE PASO HACER MOVE
+    end_hanoi_move:
+        # Hacer movimiento del disco que apunta a t0 (origen) a t1 (destino)
+        lw t2 0 t0
+        sw t2 0(t1)
+        addi t1 t1 4
+        
+        sw zero 0(t0)
+        
+
+        # ACTUALIAR APUNTADORES de los registros s: Mover el apuntador del origen -4
+        jal zero end_hanoi_update_destino # cambio
+
+
+        # if origen == 1 entonces mover s1 - 4
+        addi t2 zero 1 
+        beq a1 t2 moveOri1
+        
+        # if origen == 2 entonces t0 = s2 - 4
+        addi t2 zero 2
+        beq a1 t2 moveOri2
+        
+        # if origen == 3 entonces t0 = s3 - 4
+        addi t2 zero 3 
+        beq a1 t2 moveOri3
         
     end_hanoi_update_destino:
         
