@@ -177,3 +177,31 @@ moveOriM2:
 moveOriM3:
     addi s3 s3 4
     jalr zero ra 0 
+
+#==========================================
+
+        
+    end_hanoi_update_destino:
+        
+        # Mover el apuntador del origen -4
+        # if destino == 1 entonces mover s1 + 4
+        addi t2 zero 1 
+        beq a2 t2 moveOriM1
+
+        # if destino == 2 entonces t0 = s2 + 4
+        addi t2 zero 2 
+        beq a2 t2 moveOriM2
+        
+        # if destino == 3 entonces t0 = s3 + 5
+        addi t2 zero 3 
+        beq a2 t2 moveOriM3
+        
+
+
+
+end_hanoi_return:
+# Lo usaremos como un return
+lw ra 0 sp
+addi sp sp 4
+jalr zero ra 0 # Regresar a ra
+
