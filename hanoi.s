@@ -74,7 +74,7 @@ main:
     addi a1 zero 1 # Argumento de n
     addi a2 zero 3 # Argumento de n
     addi a3 zero 2 # Argumento de n
-
+    
 
     jal ra hanoi
     
@@ -86,19 +86,24 @@ hanoi: # (N, origen, destino, auxiliar)# Torres de Hanoi 01/04/2024
        # (a0, a1, a2, a3)
        
     # Guardar Stack frame (ra)
-    addi sp sp -4
-    sw ra 0 sp
-       
-
-    # if N == 1 entonces mover disco 1 de origen a destino
-    addi t0 zero 1 # Asignar a 1
-    beq a0 t0 base_case 
+    addi sp sp -20
+    sw ra 16 sp
+    sw s8 12 sp
+    sw s9 sp
+    sw s10 4 sp
+    sw s11 0 sp
 
     # Guardar en variables locales
     add s8 zero a0 # s8 = N
     add s9 zero a1 # s9 = ORIGEN
     add s10 zero a2 # s10 = DESTINO 
     add s11 zero a3 # s11 = AUXILIAR 
+       
+
+    # if N == 1 entonces mover disco 1 de origen a destino
+    addi t0 zero 1 # Asignar a 1
+    beq s8 t0 base_case 
+
 
     # === hanoi(N - 1, origen, auxiliar, destino); ====
     addi a0 s0 -1 # N(argumento) = N - 1
@@ -188,85 +193,85 @@ base_case:
 
 
 
-
 move:
     # t0 = origen
     # t1 = destino 
 
     # if origen == 1 entonces t0 = s1
     addi t2 zero 1 
-    beq a1 t2 asignar_t0_s1
+    beq s9 t2 asignar_t0_s1
 
     # if origen == 2 entonces t0 = s2
     addi t2 zero 2 
-    beq a1 t2 asignar_t0_s2
+    beq s10 t2 asignar_t0_s2
 
     # if origen == 3 entonces t0 = s3
     addi t2 zero 3 
-    beq a1 t2 asignar_t0_s3
+    beq s11 t2 asignar_t0_s3
 
     end_hanoi_destino:
 
 
         # if destino == 1 entonces t1 = s1
         addi t2 zero 1 
-        beq a2 t2 asignar_t1_s1
+        beq s10 t2 asignar_t1_s1
 
         # if destino == 2 entonces t1 = s2
         addi t2 zero 2 
-        beq a2 t2 asignar_t1_s2
+        beq s10 t2 asignar_t1_s2
         
         # if destino == 3 entonces t1 = s3
         addi t2 zero 3 
-        beq a2 t2 asignar_t1_s3
+        beq s10 t2 asignar_t1_s3
 
     # SIGUIENTE PASO HACER MOVE
     end_hanoi_move:
         # Hacer movimiento del disco que apunta a t0 (origen) a t1 (destino)
         lw t2 0 t0
         sw t2 0(t1)
-        addi t1 t1 4
+        addi t1 t1 4 # Mover apunatdor destino +4 para almacenar el disco 
         
         sw zero 0(t0)
         
 
-        # ACTUALIAR APUNTADORES de los registros s: Mover el apuntador del origen -4
-        jal zero end_hanoi_update_destino # cambio
+    # ACTUALIAR APUNTADORES de los registros s: Mover el apuntador del origen -4
 
-
-        # if origen == 1 entonces mover s1 - 4
-        addi t2 zero 1 
-        beq a1 t2 moveOri1
-        
-        # if origen == 2 entonces t0 = s2 - 4
-        addi t2 zero 2
-        beq a1 t2 moveOri2
-        
-        # if origen == 3 entonces t0 = s3 - 4
-        addi t2 zero 3 
-        beq a1 t2 moveOri3
+    # if origen == 1 entonces mover s1 - 4
+    addi t2 zero 1 
+    beq s9 t2 moveOri1
+    
+    # if origen == 2 entonces t0 = s2 - 4
+    addi t2 zero 2
+    beq s9 t2 moveOri2
+    
+    # if origen == 3 entonces t0 = s3 - 4
+    addi t2 zero 3 
+    beq s9 t2 moveOri3
         
     end_hanoi_update_destino:
         
         # Mover el apuntador del origen -4
         # if destino == 1 entonces mover s1 + 4
         addi t2 zero 1 
-        beq a2 t2 moveOriM1
+        beq a10 t2 moveOriM1
 
         # if destino == 2 entonces t0 = s2 + 4
         addi t2 zero 2 
-        beq a2 t2 moveOriM2
+        beq a10 t2 moveOriM2
         
-        # if destino == 3 entonces t0 = s3 + 5
+        # if destino == 3 entonces t0 = s3 + 4
         addi t2 zero 3 
-        beq a2 t2 moveOriM3
+        beq a10 t2 moveOriM3
         
-
-
 
 end_hanoi_return:
-# Lo usaremos como un return
-lw ra 0 sp
-addi sp sp 4
-jalr zero ra 0 # Regresar a ra
+    # Recuperar Stack frame (ra)
+    lw ra 16 sp
+    lw s8 12 sp
+    lw s9 sp
+    lw s10 4 sp
+    lw s11 0 sp
+    addi sp sp 20
+
+    jalr zero ra 0 # Regresar a ra
 
