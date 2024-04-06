@@ -1,10 +1,9 @@
-
 # Torres de Hanoi 01/04/2024
 
 # David Hernandez
 # Jose Hurtado
 
-.equ N 3
+.equ N 2
 
 .data
 torres:
@@ -16,27 +15,27 @@ torres:
 # Primero, tres apuntadores para las tres torres
 # con base en la cantidad de discos maximos que pueden soportar
 
-# s0 = Torre A
-# s1 = Torre B
-# s2 = Torre C
+# s1 = Torre A
+# s2 = Torre B
+# s3 = Torre C
 
 # Torre A
-lui s0 %hi(torres)
-addi s0 s0 %lo(torres) # Pointer where result will be stored
+lui s1 %hi(torres)
+addi s1 s1 %lo(torres) # Pointer where result will be stored
 
 # Torre B
-add s1 s0 s1
-addi t0 zero 4 # size of word
-addi t1 zero N
-mul t0 t0 t1 # size of word * N (number of disks)
-add s1 s1 t0
-
-# Torre C
 add s2 s1 s2
 addi t0 zero 4 # size of word
 addi t1 zero N
 mul t0 t0 t1 # size of word * N (number of disks)
 add s2 s2 t0
+
+# Torre C
+add s3 s2 s3
+addi t0 zero 4 # size of word
+addi t1 zero N
+mul t0 t0 t1 # size of word * N (number of disks)
+add s3 s3 t0
 
 
 # cargar discos de la forma
@@ -53,56 +52,128 @@ load_data:
         # else
         addi t1 zero N
         sub t1 t1 t0 # Store N - i
-        sw t1 0 s0
-        addi s0 s0 4 # move s0 + 4
+        sw t1 0 s1
+        addi s1 s1 4 # move s1 + 4
         
         # i += 1
         addi t0 t0 1
         jal zero for_loop
         
 end_load_data:    
-    # Recuperar el espacio de s0 (Torre A)
-    addi t0 zero 4 # size of word
-    addi t1 zero N
-    mul t0 t1 t0 # size of word * N
-    addi t1 zero -1 # Make t1 = -1
-    mul t0 t0 t1 # t0 = to * -1
-    add s0 s0 t0
+    # Recuperar el espacio de s1 (Torre A)
+    addi s1 s1 -4
 
 
 main:
-    addi a0 zero N # n
-    addi a1 zero 1 # start en Torre A
-    addi a2 zero 3 # end en Torre C
-    
+    addi s0 zero N # Torre de discos
+    addi s1 s1 0 # Apuntador a Torre 1
+    addi s2 s2 0 # Apuntador a Torre 2 
+    addi s3 s3 0 # Apuntador a Torre 3
+
+    addi a0 s0 0 # Argumento de n
+    addi a1 zero 1 # Argumento de n
+    addi a2 zero 3 # Argumento de n
+    addi a3 zero 2 # Argumento de n
+
+
     jal ra hanoi
-    
     
     addi a7 zero 10
     ecall # Terminar programa
+    
+    
+hanoi: # (N, origen, destino, auxiliar)# Torres de Hanoi 01/04/2024
+       # (a0, a1, a2, a3)
+       
+    # Guardar Stack frame (ra)
+    addi sp sp -4
+    sw ra 0 sp
+       
+
+    # if N == 1 entonces mover disco 1 de origen a destino
+    addi t0 zero 1 # Asignar a 1
+    beq a0 t0 base_case 
+
+    # hanoi(N - 1, origen, auxiliar, destino); (aqui origen se conserva a1=a1, swap entre aux y dest a2 = a3, a3 = a2)
+    # Hacer N - 1
+    addi t0 zero -1 # Asignar - 1 a t0
+    add a0 a0 t0 # N = N - 1
+    
+    # swap aux y dest -> a2 = a3
+    add s4 zero a2 # s4 = a2
+    add a2 zero a3 # a2 = a3
+    
+    # swap aux y dest -> a3 = a2 (s4)
+    add a3 zero s4
+    
+    jal ra hanoi # hanoi(N-1, origen, auxiliar, destino)
+    
+    # TO DO printf("Mover disco %d desde %c hasta %c\n", N, origen, destino)
+    jal ra swap 
 
 
-hanoi: # (ra, n, start, end)
-    # Stack frame
-    addi sp sp -16
-    sw ra 12(sp)
-    sw a0 8(sp)
-    sw a1 4(sp)
-    sw a2 0(sp)
+
+
+
+
+    # TO DO moverTorres(N - 1, auxiliar, destino, origen);
+
+
+    jal zero end_hanoi_return
+
+
+
+
+#==========================================
+
+asignar_t0_s1:
+    addi t0 s1 0
+    jal zero end_hanoi_destino
+
+asignar_t0_s2:
+    addi t0 s2 0
+    jal zero end_hanoi_destino
     
-    # Base case n == 1:
-        # Move top of start position to end
-        
+asignar_t0_s3:
+    addi t0 s3 0
+    jal zero end_hanoi_destino
+
+
+asignar_t1_s1:
+    addi t1 s1 0
+    jal zero end_hanoi_move
+
+asignar_t1_s2:
+    addi t1 s2 0
+    jal zero end_hanoi_move
+
+asignar_t1_s3:
+    addi t1 s3 0
+    jal zero end_hanoi_move
+
+
+moveOri1:
+    addi s1 s1 -4
+    jal zero end_hanoi_update_destino
+
+moveOri2:
+    addi s2 s2 -4
+    jal zero end_hanoi_update_destino 
+
+moveOri3:
+    addi s3 s3 -4
+    jal zero end_hanoi_update_destino
+
     
+
+moveOriM1:
+    addi s1 s1 4
+    jalr zero ra 0 
     
-    
-    
-    
-    end_hanoi:
-        # Recuperar stack frame
-        lw a2 0(sp)
-        lw a1 4(sp)
-        lw a0 8(sp)
-        lw ra 12(sp)
-        addi sp sp 16
-        jalr ra zero 0 # Regresar al pasado ra
+moveOriM2:
+    addi s2 s2 4
+    jalr zero ra 0 
+
+moveOriM3:
+    addi s3 s3 4
+    jalr zero ra 0 
