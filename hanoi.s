@@ -3,7 +3,7 @@
 # David Hernandez
 # Jose Hurtado
 
-.equ N 2
+.equ N 5
 
 .data
 torres:
@@ -61,7 +61,7 @@ load_data:
         
 end_load_data:    
     # Recuperar el espacio de s1 (Torre A)
-    addi s1 s1 -4
+ 
 
 
 main:
@@ -89,7 +89,7 @@ hanoi: # (N, origen, destino, auxiliar)# Torres de Hanoi 01/04/2024
     addi sp sp -20
     sw ra 16 sp
     sw s8 12 sp
-    sw s9 sp
+    sw s9 8 sp
     sw s10 4 sp
     sw s11 0 sp
 
@@ -106,7 +106,7 @@ hanoi: # (N, origen, destino, auxiliar)# Torres de Hanoi 01/04/2024
 
 
     # === hanoi(N - 1, origen, auxiliar, destino); ====
-    addi a0 s0 -1 # N(argumento) = N - 1
+    addi a0 s8 -1 # N(argumento) = N - 1
     add a1 zero s9 # a1 = origen actual (s9)
     add a2 zero s11 # a2 = auxiliar actual (s11)
     add a3 zero s10 # a3 = destino actual (s10)
@@ -116,7 +116,7 @@ hanoi: # (N, origen, destino, auxiliar)# Torres de Hanoi 01/04/2024
     jal ra move
 
     # === moverTorres(N - 1, auxiliar, destino, origen); === 
-    addi a0 s0 -1 # N(argumento) = N - 1
+    addi a0 s8 -1 # N(argumento) = N - 1
     add a1 zero s11 # a1 = auxiliar actual (s11)
     add a2 zero s10 # a2 = destino actual (s10)
     add a3 zero s9 # a1 = origen actual (s9)
@@ -203,11 +203,11 @@ move:
 
     # if origen == 2 entonces t0 = s2
     addi t2 zero 2 
-    beq s10 t2 asignar_t0_s2
+    beq s9 t2 asignar_t0_s2
 
     # if origen == 3 entonces t0 = s3
     addi t2 zero 3 
-    beq s11 t2 asignar_t0_s3
+    beq s9 t2 asignar_t0_s3
 
     end_hanoi_destino:
 
@@ -227,11 +227,11 @@ move:
     # SIGUIENTE PASO HACER MOVE
     end_hanoi_move:
         # Hacer movimiento del disco que apunta a t0 (origen) a t1 (destino)
-        lw t2 0 t0
+        lw t2 -4 t0
         sw t2 0(t1)
-        addi t1 t1 4 # Mover apunatdor destino +4 para almacenar el disco 
         
-        sw zero 0(t0)
+        addi t1 t1 4 # Mover apunatdor destino +4 para almacenar el disco 
+        sw zero -4(t0)
         
 
     # ACTUALIAR APUNTADORES de los registros s: Mover el apuntador del origen -4
@@ -253,22 +253,22 @@ move:
         # Mover el apuntador del origen -4
         # if destino == 1 entonces mover s1 + 4
         addi t2 zero 1 
-        beq a10 t2 moveOriM1
+        beq s10 t2 moveOriM1
 
         # if destino == 2 entonces t0 = s2 + 4
         addi t2 zero 2 
-        beq a10 t2 moveOriM2
+        beq s10 t2 moveOriM2
         
         # if destino == 3 entonces t0 = s3 + 4
         addi t2 zero 3 
-        beq a10 t2 moveOriM3
+        beq s10 t2 moveOriM3
         
 
 end_hanoi_return:
     # Recuperar Stack frame (ra)
     lw ra 16 sp
     lw s8 12 sp
-    lw s9 sp
+    lw s9 8 sp
     lw s10 4 sp
     lw s11 0 sp
     addi sp sp 20
